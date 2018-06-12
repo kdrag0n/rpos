@@ -6,7 +6,7 @@ ASFLAGS = -Iinclude
 BUILD_DIR = out
 SRC_DIR = src
 
-all: kernel7.img sdcard.img
+all: kernel7.img
 
 clean:
 	rm -fr $(BUILD_DIR) *.img
