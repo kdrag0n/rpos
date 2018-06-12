@@ -27,6 +27,6 @@ OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-kernel7.img: $(SRC_DIR)/linker.ld $(OBJ_FILES)
+kernel7.img: $(SRC_DIR)/linkelf.ld $(OBJ_FILES)
 	$(CROSS_COMPILE)ld -T src/linker.ld -o $(BUILD_DIR)/kernel7.elf $(OBJ_FILES)
 	$(CROSS_COMPILE)objcopy $(BUILD_DIR)/kernel7.elf -O binary kernel7.img
