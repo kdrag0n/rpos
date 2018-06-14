@@ -2,6 +2,9 @@
 #include "peripherals/gpio.h"
 #include "peripherals/uart.h"
 #include "utils.h"
+#include "types.h"
+
+bool uart_lock;
 
 void uart_init(void) {
     unsigned int selector;
@@ -28,12 +31,26 @@ void uart_init(void) {
     put32(AUX_MU_LCR_REG, 3);   // enable 8 bit mode
     put32(AUX_MU_MCR_REG, 0);   // set RTS line to be always high (3.3V)
     put32(AUX_MU_BAUD_REG, 270);// set baud rate to 115200
-    put32(AUX_MU_IIR_REG, 6);   // clear fifo buffer
+    // put32(AUX_MU_IIR_REG, 6);// clear fifo buffer
 
     put32(AUX_MU_CNTL_REG, 3);  // enable tx and rx
 }
 
+void _uart_get(void) {
+    while (uart_lock) {
+        sleep(100);
+    }
+
+    uart_lock = 1;
+}
+
+void _uart_release(void) {
+    uart_lock = 0;
+}
+
 void uart_send(char c) {
+    _uart_get();
+
     while (1) {
         if (get32(AUX_MU_LSR_REG) & 0x20) {
             break;
@@ -41,16 +58,21 @@ void uart_send(char c) {
     }
 
     put32(AUX_MU_IO_REG, c);
+    _uart_release();
 }
 
 char uart_recv(void) {
+    _uart_get();
+
     while (1) {
         if (get32(AUX_MU_LSR_REG) & 0x01) {
             break;
         }
     }
 
-    return get32(AUX_MU_IO_REG) & 0xFF;
+    char val = get32(AUX_MU_IO_REG) & 0xFF;
+    _uart_release();
+    return val;
 }
 
 void uart_send_string(char* str) {

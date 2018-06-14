@@ -18,3 +18,10 @@ sleep:
     subs    x0, x0, #1  // subtract 1 from x0 , store flags (Z: cond)
     bne     sleep       // loop to self if not Z
     ret                 // return
+
+// get the current cpu id
+.globl cpuid
+cpuid:
+    mrs     x0, mpidr_el1   // copy mpidr_el1 (cpu info) into x0
+    and     x0, x0, #0xFF   // strip last 2 bytes - mpidr_el1 isn't ONLY cpu id
+    ret                     // cpu id in x0

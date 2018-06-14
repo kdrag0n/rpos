@@ -2,10 +2,15 @@
 
 .section ".text.boot"
 
-// rpi3 has 4 cores. each starts executing at the same entry point.
-// we only want 1 for simplicity, so hang the rest.
+// entry point for execution. all 4 cores execute this simultaneously.
 .globl _start
 _start:
+    // b    cpu0_only       // only execute on cpu 0
+    b       master_init     // begin kernel initialization
+
+// rpi3 has 4 cores. each starts executing at the same entry point.
+// we only want 1 for simplicity, so hang the rest.
+cpu0_only:
     mrs     x0, mpidr_el1   // copy mpidr_el1 (cpu info) into x0
     and     x0, x0, #0xFF   // strip last 2 bytes - mpidr_el1 isn't ONLY cpu id
     cbz     x0, master_init // if (x0 == 0) goto master_init
