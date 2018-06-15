@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "types.h"
 
-bool uart_lock;
+bool uart_lock = 0;
 
 void uart_init(void) {
     unsigned int selector;

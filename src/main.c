@@ -2,8 +2,8 @@
 #include "utils.h"
 #include "types.h"
 
-bool uart_init_done;
-unsigned int hello_cpuid;
+bool uart_init_done = 0;
+unsigned int hello_cpuid = 0;
 
 void kernel_main(void) {
     if (cpuid() == 0) {
@@ -30,7 +30,7 @@ void kernel_main(void) {
     pr_info("Starting UART echo on cpu0");
 
     char buf[256];
-    int buf_pos;
+    int buf_pos = 0;
 
     while (1) { // echo loop
         char ch = uart_recv();
