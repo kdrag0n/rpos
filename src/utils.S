@@ -25,3 +25,10 @@ cpuid:
     mrs     x0, mpidr_el1   // copy mpidr_el1 (cpu info) into x0
     and     x0, x0, #0xFF   // strip last 2 bytes - mpidr_el1 isn't ONLY cpu id
     ret                     // cpu id in x0
+
+// get the current cpu exception level
+.globl get_el
+get_el:
+    mrs x0, CurrentEL       // get CurrentEL register into x0
+    lsr x0, x0, #2          // logical shift right 2 bits: first 2 bits are reserved with value 0
+    ret                     // return exception level

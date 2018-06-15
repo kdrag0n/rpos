@@ -4,7 +4,9 @@
 extern void sleep(unsigned long);
 extern void put32(unsigned long, unsigned int);
 extern unsigned int get32(unsigned long);
+
 extern unsigned int cpuid(void);
+extern int get_el(void);
 
 extern void cpu0_only(void);
 
