@@ -1,4 +1,5 @@
 #pragma once
+#include "log.h"
 
 extern void sleep(unsigned long);
 extern void put32(unsigned long, unsigned int);

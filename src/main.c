@@ -8,9 +8,8 @@ unsigned int hello_cpuid;
 void kernel_main(void) {
     if (cpuid() == 0) {
         uart_init();
-        uart_send_string("Mini UART init completed on processor ");
-        uart_send(itoa(cpuid()));
-        uart_send('\n');
+        init_printf(0, uart_putc);
+        pr_debug("Mini UART initialized on cpu%u", cpuid());
         uart_init_done = 1;
     } else {
         while (!uart_init_done) {
@@ -22,15 +21,13 @@ void kernel_main(void) {
         sleep(100);
     }
 
-    uart_send_string("Hello from processor ");
-    uart_send(itoa(cpuid()));
-    uart_send_string("!\n");
+    pr_debug("Init on cpu%u", cpuid());
     hello_cpuid++;
 
-    uart_send_string("Processor messages completed, hanging all other than cpu0...");
+    pr_debug("Hanging all except cpu0...");
 
     cpu0_only();
-    uart_send_String("Welcome to cpu0!");
+    pr_info("Starting UART echo on cpu0");
 
     char buf[256];
     int buf_pos;
