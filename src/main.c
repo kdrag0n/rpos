@@ -27,22 +27,25 @@ void kernel_main(void) {
     uart_send_string("!\n");
     hello_cpuid++;
 
-    if (cpuid() == 0) {
-        char buf[256];
-        int buf_pos;
+    uart_send_string("Processor messages completed, hanging all other than cpu0...");
 
-        while (1) { // echo loop
-            char ch = uart_recv();
-            buf[buf_pos++] = ch;
-            buf[buf_pos] = '\0';
+    cpu0_only();
+    uart_send_String("Welcome to cpu0!");
 
-            if (ch == '\n') {
-                uart_send('\n');
-                uart_send_string(buf);
-                uart_send('\n');
+    char buf[256];
+    int buf_pos;
 
-                buf_pos = 0;
-            }
+    while (1) { // echo loop
+        char ch = uart_recv();
+        buf[buf_pos++] = ch;
+        buf[buf_pos] = '\0';
+
+        if (ch == '\n') {
+            uart_send('\n');
+            uart_send_string(buf);
+            uart_send('\n');
+
+            buf_pos = 0;
         }
     }
 }

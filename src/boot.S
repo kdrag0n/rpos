@@ -10,6 +10,7 @@ _start:
 
 // rpi3 has 4 cores. each starts executing at the same entry point.
 // we only want 1 for simplicity, so hang the rest.
+.globl cpu0_only
 cpu0_only:
     mrs     x0, mpidr_el1   // copy mpidr_el1 (cpu info) into x0
     and     x0, x0, #0xFF   // strip last 2 bytes - mpidr_el1 isn't ONLY cpu id
