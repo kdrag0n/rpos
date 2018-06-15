@@ -13,10 +13,10 @@ clean:
 
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
-	$(CROSS_COMPILE)gcc $(CFLAGS) -MMD -c $< -o $@
+	$(CROSS_COMPILE)$(CC) $(CFLAGS) -MMD -c $< -o $@
 
 $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
-	$(CROSS_COMPILE)gcc $(ASFLAGS) -MMD -c $< -o $@
+	$(CROSS_COMPILE)$(CC) $(ASFLAGS) -MMD -c $< -o $@
 
 C_FILES = $(wildcard src/*.c)
 ASM_FILES = $(wildcard src/*.S)
