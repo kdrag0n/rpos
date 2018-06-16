@@ -21,7 +21,7 @@ void kernel_main(void) {
         sleep(100);
     }
 
-    pr_debug("Init on cpu%u", cpuid());
+    pr_debug("Init on cpu%u, exception level %d", cpuid(), get_el());
     hello_cpuid++;
 
     pr_debug("Hanging all except cpu0...");
