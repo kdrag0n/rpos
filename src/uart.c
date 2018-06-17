@@ -3,10 +3,15 @@
 #include "peripherals/uart.h"
 #include "utils.h"
 #include "types.h"
+#include "lock.h"
 
-bool uart_lock = 0;
+static struct lock *uart_lock;
+static struct lock *uart_str_lock;
 
 void uart_init(void) {
+    lock_init(uart_lock);
+    lock_init(uart_str_lock);
+
     unsigned int selector;
 
     // the GPFSEL1 register controls alts for pins 10-19
@@ -36,20 +41,8 @@ void uart_init(void) {
     put32(AUX_MU_CNTL_REG, 3);  // enable tx and rx
 }
 
-void _uart_get(void) {
-    while (uart_lock) {
-        sleep(100);
-    }
-
-    uart_lock = 1;
-}
-
-void _uart_release(void) {
-    uart_lock = 0;
-}
-
 void uart_send(char c) {
-    _uart_get();
+    lock_get(uart_lock);
 
     while (1) {
         if (get32(AUX_MU_LSR_REG) & 0x20) {
@@ -58,11 +51,11 @@ void uart_send(char c) {
     }
 
     put32(AUX_MU_IO_REG, c);
-    _uart_release();
+    lock_release(uart_lock);
 }
 
 char uart_recv(void) {
-    _uart_get();
+    lock_get(uart_lock);
 
     while (1) {
         if (get32(AUX_MU_LSR_REG) & 0x01) {
@@ -71,16 +64,25 @@ char uart_recv(void) {
     }
 
     char val = get32(AUX_MU_IO_REG) & 0xFF;
-    _uart_release();
+    lock_release(uart_lock);
     return val;
 }
 
 void uart_send_string(char* str) {
+    lock_get(uart_str_lock);
+
     for (int i = 0; str[i] != '\0'; i++) {
         uart_send((char) str[i]);
     }
+
+    lock_release(uart_str_lock);
 }
 
 void uart_putc(void* p, char c) {
     uart_send(c);
+}
+
+void uart_debug(void) {
+    lock_dump("uart_lock", uart_lock);
+    lock_dump("uart_str_lock", uart_str_lock);
 }

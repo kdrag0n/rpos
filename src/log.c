@@ -2,7 +2,7 @@
 #include "printf.h"
 #include "uart.h"
 
-unsigned int log_idx = 0;
+unsigned int log_seq = 0;
 
 char loglevel_char(unsigned int level) {
     switch (level) {
@@ -16,13 +16,13 @@ char loglevel_char(unsigned int level) {
 }
 
 void _printk(unsigned int level, char *fmt, va_list va) {
-    char fmt_full[512];
-    tfp_sprintf(fmt_full, "%03u%c %s\n", log_idx++, loglevel_char(level), fmt);
+    char fmt_full[518];
+    tfp_sprintf(fmt_full, "%03u%c %s\r\n", log_seq++, loglevel_char(level), fmt);
 
     tfp_format(0, uart_putc, fmt_full, va);
 }
 
-void printk(unsigned int level, char* fmt, ...) {
+void printk(unsigned int level, char *fmt, ...) {
     va_list va;
     va_start(va, fmt);
     _printk(level, fmt, va);

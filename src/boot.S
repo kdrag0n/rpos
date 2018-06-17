@@ -14,8 +14,7 @@ _start:
 cpu0_only:
     mrs     x0, mpidr_el1   // copy mpidr_el1 (cpu info) into x0
     and     x0, x0, #0xFF   // strip last 2 bytes - mpidr_el1 isn't ONLY cpu id
-    cbz     x0, master_init // if (x0 == 0) goto master_init
-    b       proc_hang       // if not, hang the cpu
+    b       proc_hang       // if (x0 != 0), hang the cpu
 
 // fill the .bss elf section with zeroes
 master_init:

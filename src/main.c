@@ -12,37 +12,27 @@ void kernel_main(void) {
         pr_debug("Mini UART initialized on cpu%u", cpuid());
         uart_init_done = 1;
     } else {
-        while (!uart_init_done) {
-            sleep(150);
-        }
+        while (!uart_init_done) {}
     }
 
-    while (hello_cpuid != cpuid()) {
-        sleep(100);
-    }
+    while (hello_cpuid != cpuid()) {}
 
     pr_debug("Init on cpu%u, exception level %d", cpuid(), get_el());
     hello_cpuid++;
 
-    pr_debug("Hanging all except cpu0...");
+    while (hello_cpuid != 4) {}
+    if (cpuid() == 0) {
+        pr_warn("Hanging all except cpu0...");
+    }
+    if (cpuid() != 0) {
+        while (1) {}
+    }
 
-    cpu0_only();
-    pr_info("Starting UART echo on cpu0");
+    uart_debug();
+    pr_info("Starting echo loop on cpu0");
 
-    char buf[256];
-    int buf_pos = 0;
-
-    while (1) { // echo loop
+    while (1) {
         char ch = uart_recv();
-        buf[buf_pos++] = ch;
-        buf[buf_pos] = '\0';
-
-        if (ch == '\n') {
-            uart_send('\n');
-            uart_send_string(buf);
-            uart_send('\n');
-
-            buf_pos = 0;
-        }
+        uart_send(ch);
     }
 }
